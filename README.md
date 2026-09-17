@@ -1,145 +1,677 @@
-# DeployX
+# 🚀 DeployX
 
-<<<<<<< HEAD
-DeployX is a production-minded DevOps deployment and infrastructure platform for teams that want a single, clear view of applications, CI/CD, Docker images, servers, logs, and incidents.
+### Production-Minded DevOps Deployment & Infrastructure Platform
 
-## Product overview
+DeployX is a modern DevOps platform designed to give development and infrastructure teams a **single, centralized view of applications, deployments, CI/CD pipelines, Docker images, cloud infrastructure, logs, and incidents**.
 
-- Overview dashboard with deployment, availability, and resource metrics
-- Application and deployment management with detail drawers
-- Visual CI/CD pipeline from GitHub push to EC2 health check
-- Docker registry inventory and image history
-- AWS EC2 infrastructure monitoring
-- Searchable deployment and service logs
-- Incident tracking with severity and ownership
-- Workspace profile and connected-service settings
-- Responsive dark developer-tool interface
+The platform provides a developer-tool-style dashboard with a responsive dark interface and includes **clearly labelled demo data and a simulated deployment pipeline**, allowing the project to be demonstrated without requiring live AWS, GitHub, or Docker Registry credentials.
 
-The interface includes clearly labelled demo data and a simulated pipeline runner so it can be demonstrated without connecting AWS, GitHub, or Docker Hub.
+---
 
-## Architecture
+## ✨ Features
 
-The frontend is a Vite + React + TypeScript application. Supabase provides PostgreSQL persistence and email/password authentication when connected. The database schema includes profiles, applications, deployments, pipelines, Docker images, servers, logs, and incidents with row-level security enabled.
+### 📊 Deployment Dashboard
 
-Current UI data is deliberately demo-only and lives in `src/services/mockWorkspace.ts`. `src/services/workspace.ts` is the typed integration boundary for Supabase; it returns no data until public `VITE_SUPABASE_*` values are configured. This makes the demo safe to run without credentials and gives production code one place to replace the mock fallback.
+* Application deployment overview
+* Availability and deployment metrics
+* Resource monitoring
+* Recent deployment activity
+* Service health visibility
 
-For production, the intended flow is:
+### 📦 Application Management
 
-`GitHub push → CI/CD runner → Docker image → private registry → SSH to EC2 → container restart → health check`
+* Application listing and details
+* Deployment history
+* Application status
+* Environment information
+* Deployment detail drawers
 
-## Local development
+### 🔄 CI/CD Pipeline
 
-Install dependencies and start the already-configured Vite development server through your normal project workflow. The demo workspace is immediately available from the sign-in screen.
+Visualize the complete deployment workflow:
 
-## Environment variables
-
-Copy `.env.example` to your local environment and provide the Supabase project values for persisted data and authentication. Never commit real credentials, service-role keys, AWS keys, Docker tokens, GitHub tokens, or SSH private keys.
-
-## Database setup
-
-The project includes a Supabase migration named `create_deployx_schema` that creates the application tables, indexes, ownership policies, profile trigger, and timestamp triggers.
-
-## Docker
-
-- `Dockerfile.frontend` uses a multi-stage build and an unprivileged Nginx image. It includes SPA fallback, immutable asset caching, compression, security headers, and a health endpoint.
-- `Dockerfile.backend` runs as the `node` user and exposes only `/healthz` until product APIs are implemented.
-- `docker-compose.yml` starts the frontend on `http://localhost:8080`, waits for backend health, and does not publish the internal backend port.
-
-Run the containerized stack with `docker compose up --build`.
-
-## Production deployment
-
-Build the frontend image, push an immutable commit SHA tag plus `latest`, then promote the same image through staging and production. The EC2 host should pull the selected tag, restart the container, and verify the application health endpoint before marking the deployment successful.
-=======
-
-
-## Getting started
-
-To make it easy for you to get started with GitLab, here's a list of recommended next steps.
-
-Already a pro? Just edit this README.md and make it your own. Want to make it easy? [Use the template at the bottom](#editing-this-readme)!
-
-## Add your files
-
-* [Create](https://docs.gitlab.com/user/project/repository/web_editor/#create-a-file) or [upload](https://docs.gitlab.com/user/project/repository/web_editor/#upload-a-file) files
-* [Add files using the command line](https://docs.gitlab.com/topics/git/add_files/#add-files-to-a-git-repository) or push an existing Git repository with the following command:
-
-```
-cd existing_repo
-git remote add origin https://gitlab.com/navnitkumar927/deployx.git
-git branch -M main
-git push -uf origin main
+```text
+GitHub Push
+     ↓
+CI/CD Runner
+     ↓
+Build & Test
+     ↓
+Docker Image
+     ↓
+Private Registry
+     ↓
+EC2 Deployment
+     ↓
+Container Restart
+     ↓
+Health Check
+     ↓
+Deployment Successful
 ```
 
-## Integrate with your tools
+The current application includes a **simulated pipeline runner** for demonstration purposes.
 
-* [Set up project integrations](https://gitlab.com/navnitkumar927/deployx/-/settings/integrations)
+### 🐳 Docker Registry
 
-## Collaborate with your team
+* Docker image inventory
+* Image version history
+* Immutable image tags
+* Commit SHA based image identification
+* Registry deployment workflow
 
-* [Invite team members and collaborators](https://docs.gitlab.com/user/project/members/)
-* [Create a new merge request](https://docs.gitlab.com/user/project/merge_requests/creating_merge_requests/)
-* [Automatically close issues from merge requests](https://docs.gitlab.com/user/project/issues/managing_issues/#closing-issues-automatically)
-* [Enable merge request approvals](https://docs.gitlab.com/user/project/merge_requests/approvals/)
-* [Set auto-merge](https://docs.gitlab.com/user/project/merge_requests/auto_merge/)
+### ☁️ AWS Infrastructure
 
-## Test and Deploy
+* EC2 server monitoring
+* Server health information
+* Resource visibility
+* Deployment target management
 
-Use the built-in continuous integration in GitLab.
+### 📋 Logs
 
-* [Get started with GitLab CI/CD](https://docs.gitlab.com/ci/quick_start/)
-* [Analyze your code for known vulnerabilities with Static Application Security Testing (SAST)](https://docs.gitlab.com/user/application_security/sast/)
-* [Deploy to Kubernetes, Amazon EC2, or Amazon ECS using Auto Deploy](https://docs.gitlab.com/topics/autodevops/requirements/)
-* [Use pull-based deployments for improved Kubernetes management](https://docs.gitlab.com/user/clusters/agent/)
-* [Set up protected environments](https://docs.gitlab.com/ci/environments/protected_environments/)
+* Searchable deployment logs
+* Service logs
+* Deployment activity
+* Error and operational information
 
-***
+### 🚨 Incident Management
 
-# Editing this README
+* Incident tracking
+* Severity levels
+* Ownership
+* Incident status
+* Operational visibility
 
-When you're ready to make this README your own, just edit this file and use the handy template below (or feel free to structure it however you want - this is just a starting point!). Thanks to [makeareadme.com](https://www.makeareadme.com/) for this template.
+### ⚙️ Workspace & Integrations
 
-## Suggestions for a good README
+* Workspace profile
+* Connected-service settings
+* Supabase authentication
+* Supabase database integration
 
-Every project is different, so consider which of these sections apply to yours. The sections used in the template are suggestions for most open source projects. Also keep in mind that while a README can be too long and detailed, too long is better than too short. If you think your README is too long, consider utilizing another form of documentation rather than cutting out information.
+---
 
-## Name
-Choose a self-explaining name for your project.
+# 🏗️ Architecture
 
-## Description
-Let people know what your project can do specifically. Provide context and add a link to any reference visitors might be unfamiliar with. A list of Features or a Background subsection can also be added here. If there are alternatives to your project, this is a good place to list differentiating factors.
+DeployX follows a modular architecture designed to separate the frontend, persistence layer, and future infrastructure integrations.
 
-## Badges
-On some READMEs, you may see small images that convey metadata, such as whether or not all the tests are passing for the project. You can use Shields to add some to your README. Many services also have instructions for adding a badge.
+```text
+                         ┌─────────────────────┐
+                         │      Developer      │
+                         └──────────┬──────────┘
+                                    │
+                                    │ Git Push
+                                    ▼
+                         ┌─────────────────────┐
+                         │       GitHub        │
+                         └──────────┬──────────┘
+                                    │
+                                    ▼
+                         ┌─────────────────────┐
+                         │    CI/CD Runner     │
+                         │                     │
+                         │ Build → Test → Scan │
+                         └──────────┬──────────┘
+                                    │
+                                    ▼
+                         ┌─────────────────────┐
+                         │   Docker Registry   │
+                         │                     │
+                         │ SHA Tag + Latest    │
+                         └──────────┬──────────┘
+                                    │
+                                    ▼
+                         ┌─────────────────────┐
+                         │      AWS EC2        │
+                         │                     │
+                         │ Pull → Restart      │
+                         │ → Health Check      │
+                         └──────────┬──────────┘
+                                    │
+                                    ▼
+                         ┌─────────────────────┐
+                         │      DeployX        │
+                         │     Dashboard       │
+                         └─────────────────────┘
+```
 
-## Visuals
-Depending on what you are making, it can be a good idea to include screenshots or even a video (you'll frequently see GIFs rather than actual videos). Tools like ttygif can help, but check out Asciinema for a more sophisticated method.
+---
 
-## Installation
-Within a particular ecosystem, there may be a common way of installing things, such as using Yarn, NuGet, or Homebrew. However, consider the possibility that whoever is reading your README is a novice and would like more guidance. Listing specific steps helps remove ambiguity and gets people to using your project as quickly as possible. If it only runs in a specific context like a particular programming language version or operating system or has dependencies that have to be installed manually, also add a Requirements subsection.
+# 🧰 Tech Stack
 
-## Usage
-Use examples liberally, and show the expected output if you can. It's helpful to have inline the smallest example of usage that you can demonstrate, while providing links to more sophisticated examples if they are too long to reasonably include in the README.
+## Frontend
 
-## Support
-Tell people where they can go to for help. It can be any combination of an issue tracker, a chat room, an email address, etc.
+* React
+* TypeScript
+* Vite
+* Tailwind CSS
+* ESLint
 
-## Roadmap
-If you have ideas for releases in the future, it is a good idea to list them in the README.
+## Backend / Data
 
-## Contributing
-State if you are open to contributions and what your requirements are for accepting them.
+* Supabase
+* PostgreSQL
+* Supabase Authentication
+* Row Level Security (RLS)
 
-For people who want to make changes to your project, it's helpful to have some documentation on how to get started. Perhaps there is a script that they should run or some environment variables that they need to set. Make these steps explicit. These instructions could also be useful to your future self.
+## DevOps
 
-You can also document commands to lint the code or run tests. These steps help to ensure high code quality and reduce the likelihood that the changes inadvertently break something. Having instructions for running tests is especially helpful if it requires external setup, such as starting a Selenium server for testing in a browser.
+* Docker
+* Docker Compose
+* Nginx
+* GitHub
+* CI/CD
+* AWS EC2
+* SSH
+* Private Docker Registry
 
-## Authors and acknowledgment
-Show your appreciation to those who have contributed to the project.
+## Infrastructure
 
-## License
-For open source projects, say how it is licensed.
+* AWS EC2
+* Containerized workloads
+* Immutable Docker image deployments
+* Health checks
 
-## Project status
-If you have run out of energy or time for your project, put a note at the top of the README saying that development has slowed down or stopped completely. Someone may choose to fork your project or volunteer to step in as a maintainer or owner, allowing your project to keep going. You can also make an explicit request for maintainers.
->>>>>>> 62883666cd3a2e5e97120044622010caf688a8d7
+---
+
+# 📁 Project Structure
+
+```text
+DeployX/
+│
+├── src/
+│   ├── components/
+│   ├── pages/
+│   ├── services/
+│   │   ├── mockWorkspace.ts
+│   │   └── workspace.ts
+│   ├── hooks/
+│   ├── types/
+│   └── ...
+│
+├── server/
+│
+├── supabase/
+│   └── migrations/
+│
+├── public/
+│
+├── Dockerfile.frontend
+├── Dockerfile.backend
+├── docker-compose.yml
+├── nginx.conf
+│
+├── package.json
+├── package-lock.json
+├── vite.config.ts
+├── tailwind.config.ts
+├── tsconfig.json
+├── eslint.config.js
+│
+├── .env.example
+└── README.md
+```
+
+---
+
+# 🔐 Data & Authentication Architecture
+
+Supabase provides the persistence and authentication layer when the project is connected to a Supabase instance.
+
+The database contains entities for:
+
+* Profiles
+* Applications
+* Deployments
+* Pipelines
+* Docker images
+* Servers
+* Logs
+* Incidents
+
+Row Level Security (RLS) policies are enabled to provide workspace-level data protection.
+
+The project also includes database triggers for:
+
+* Profile creation
+* Automatic timestamp updates
+
+---
+
+# 🧪 Demo Mode
+
+DeployX is designed to be demonstrated without connecting external infrastructure.
+
+The current UI uses intentionally created demo data from:
+
+```text
+src/services/mockWorkspace.ts
+```
+
+The Supabase integration boundary is:
+
+```text
+src/services/workspace.ts
+```
+
+The integration layer is typed and returns no workspace data until the required public Supabase environment variables are configured.
+
+This architecture provides two benefits:
+
+1. The application can be demonstrated without credentials.
+2. Production integrations have a clearly defined service boundary.
+
+---
+
+# 🔄 Production Deployment Strategy
+
+The intended production deployment strategy uses **immutable Docker images**.
+
+```text
+Developer
+   │
+   ▼
+GitHub Push
+   │
+   ▼
+CI/CD Pipeline
+   │
+   ├── Install Dependencies
+   ├── Lint
+   ├── Test
+   ├── Build
+   └── Security Scanning
+   │
+   ▼
+Docker Build
+   │
+   ▼
+Image Tagging
+   │
+   ├── <commit-sha>
+   └── latest
+   │
+   ▼
+Private Docker Registry
+   │
+   ▼
+AWS EC2
+   │
+   ├── Pull Image
+   ├── Stop Old Container
+   ├── Start New Container
+   └── Health Check
+   │
+   ▼
+Deployment Completed
+```
+
+### Why use commit SHA tags?
+
+Instead of deploying only:
+
+```text
+latest
+```
+
+DeployX promotes immutable images such as:
+
+```text
+deployx:8f3a91c
+```
+
+This makes deployments easier to:
+
+* Identify
+* Audit
+* Reproduce
+* Roll back
+
+The same image can be promoted through environments:
+
+```text
+Build
+  ↓
+Staging
+  ↓
+Production
+```
+
+---
+
+# 🐳 Docker
+
+DeployX provides separate Dockerfiles for the frontend and backend.
+
+## Frontend
+
+`Dockerfile.frontend` uses a multi-stage build and an unprivileged Nginx image.
+
+It provides:
+
+* Production frontend build
+* SPA routing fallback
+* Static asset caching
+* Compression
+* Security headers
+* Health endpoint
+* Non-root Nginx execution
+
+## Backend
+
+`Dockerfile.backend` runs using the Node.js `node` user.
+
+The current backend exposes:
+
+```text
+/healthz
+```
+
+as the initial health endpoint.
+
+---
+
+# 🐳 Docker Compose
+
+The project includes:
+
+```text
+docker-compose.yml
+```
+
+The containerized stack starts the frontend on:
+
+```text
+http://localhost:8080
+```
+
+The backend remains an internal service and is **not directly published to the host**.
+
+The frontend waits for backend health before becoming available.
+
+Start the complete stack with:
+
+```bash
+docker compose up --build
+```
+
+Run in detached mode:
+
+```bash
+docker compose up --build -d
+```
+
+Check running containers:
+
+```bash
+docker compose ps
+```
+
+View logs:
+
+```bash
+docker compose logs -f
+```
+
+Stop the stack:
+
+```bash
+docker compose down
+```
+
+---
+
+# 💻 Local Development
+
+## 1. Clone the repository
+
+```bash
+git clone <YOUR_REPOSITORY_URL>
+cd DeployX
+```
+
+## 2. Install dependencies
+
+```bash
+npm install
+```
+
+## 3. Configure environment variables
+
+Create a local environment file:
+
+```bash
+cp .env.example .env
+```
+
+Add the required Supabase project values.
+
+## 4. Start development server
+
+```bash
+npm run dev
+```
+
+The Vite development server will display the local URL in the terminal.
+
+---
+
+# 🔑 Environment Variables
+
+Create a `.env` file locally.
+
+Example:
+
+```env
+VITE_SUPABASE_URL=your_supabase_project_url
+VITE_SUPABASE_ANON_KEY=your_supabase_anon_key
+```
+
+> ⚠️ Never commit real credentials to Git.
+
+Do not commit:
+
+```text
+.env
+.env.local
+AWS credentials
+AWS access keys
+GitHub tokens
+GitLab tokens
+Docker registry tokens
+SSH private keys
+Supabase service-role keys
+Database passwords
+API secrets
+```
+
+Only commit safe example configuration such as:
+
+```text
+.env.example
+```
+
+---
+
+# 🗄️ Database Setup
+
+The project includes a Supabase migration:
+
+```text
+create_deployx_schema
+```
+
+The migration creates the core DeployX database structure including:
+
+* Application tables
+* Deployment tables
+* Pipeline tables
+* Docker image records
+* Server records
+* Logs
+* Incidents
+* Profiles
+* Indexes
+* Row Level Security policies
+* Profile creation trigger
+* Timestamp triggers
+
+Apply the migration using your configured Supabase workflow.
+
+---
+
+# 🔒 Security Principles
+
+DeployX follows several production-oriented security practices.
+
+### Application
+
+* Typed service boundaries
+* Environment-based configuration
+* No hard-coded secrets
+* Authentication through Supabase
+* Row Level Security
+
+### Docker
+
+* Multi-stage frontend build
+* Non-root container execution
+* Minimal runtime image
+* Internal backend networking
+
+### Deployment
+
+* Immutable image tags
+* Commit SHA deployments
+* Health verification
+* Controlled image promotion
+* SSH-based EC2 deployment
+
+---
+
+# 📈 Future Improvements
+
+The project is structured to support additional production integrations.
+
+Planned improvements include:
+
+* [ ] Real GitHub webhook integration
+* [ ] GitHub Actions integration
+* [ ] Real Docker Registry integration
+* [ ] AWS EC2 API integration
+* [ ] Live server metrics
+* [ ] Real-time deployment logs
+* [ ] Automated rollback
+* [ ] Blue/Green deployments
+* [ ] Canary deployments
+* [ ] Kubernetes deployment support
+* [ ] Terraform infrastructure provisioning
+* [ ] Prometheus metrics
+* [ ] Grafana dashboards
+* [ ] Trivy container scanning
+* [ ] SonarQube code-quality integration
+* [ ] Deployment notifications
+* [ ] Role-based access control
+* [ ] Audit logging
+
+---
+
+# 🎯 DevOps Learning Objectives
+
+This project demonstrates practical concepts across the DevOps lifecycle:
+
+```text
+Source Control
+      ↓
+CI/CD
+      ↓
+Containerization
+      ↓
+Container Registry
+      ↓
+Cloud Infrastructure
+      ↓
+Automated Deployment
+      ↓
+Health Monitoring
+      ↓
+Logging
+      ↓
+Incident Management
+      ↓
+Security
+```
+
+It is designed as a portfolio project to demonstrate how a modern deployment platform can connect **application development, CI/CD, containers, cloud infrastructure, monitoring, and operational workflows**.
+
+---
+
+# 🛠️ Useful Commands
+
+### Development
+
+```bash
+npm install
+npm run dev
+npm run build
+npm run lint
+```
+
+### Docker
+
+```bash
+docker build -f Dockerfile.frontend -t deployx-frontend .
+docker build -f Dockerfile.backend -t deployx-backend .
+
+docker compose up --build
+docker compose ps
+docker compose logs -f
+docker compose down
+```
+
+### Git
+
+```bash
+git status
+git add .
+git commit -m "Update DeployX"
+git push
+```
+
+---
+
+# 📌 Project Status
+
+**Current status:** 🚧 Active Development
+
+The current release focuses on the DeployX dashboard, demo workspace, Supabase integration boundary, Docker architecture, and production-oriented deployment design.
+
+Live cloud integrations are intentionally separated from the demo environment so the platform can be showcased safely without exposing infrastructure credentials.
+
+---
+
+# 👨‍💻 Author
+
+**Navnit Rathore**
+
+DevOps Engineer | Cloud & DevSecOps Enthusiast
+
+Areas of interest:
+
+* AWS
+* DevOps
+* DevSecOps
+* Docker
+* Kubernetes
+* CI/CD
+* Terraform
+* Cloud Security
+* Infrastructure Automation
+
+---
+
+## ⭐ Support
+
+If you find this project useful, consider giving the repository a ⭐ star.
+
+Built with a focus on **automation, reliability, security, and scalable DevOps workflows.**
