@@ -39,9 +39,22 @@ owasp:
     - echo "Starting OWASP Dependency-Check..."
     - rm -rf "$CI_PROJECT_DIR/owasp-reports"
     - mkdir -p "$CI_PROJECT_DIR/owasp-reports"
-    - docker run --rm -v owasp_data:/usr/share/dependency-check/data -v "$CI_PROJECT_DIR:/src" owasp/dependency-check:12.2.2 --noupdate --scan /src --project "DeployX" --format XML --out /src/owasp-reports --exclude '/src/node_modules/**' --exclude '/src/dist/**' --exclude '/src/owasp-reports/**'
-    - echo "----- REPORTS -----"
-    - ls -lah "$CI_PROJECT_DIR/owasp-reports"
+    - docker run --rm \
+        -v owasp_data:/usr/share/dependency-check/data \
+        -v "$CI_PROJECT_DIR:/src" \
+        owasp/dependency-check:12.2.2 \
+        --noupdate \
+        --scan /src \
+        --project "DeployX" \
+        --format XML \
+        --out /src/owasp-reports \
+        --log /src/owasp-reports/dependency-check.log \
+        --exclude '/src/node_modules/**' \
+        --exclude '/src/dist/**' \
+        --exclude '/src/owasp-reports/**'
+    - echo "----- OWASP LOG -----"
+    - tail -100 "$CI_PROJECT_DIR/owasp-reports/dependency-check.log"
+    - echo "----- EXIT CODE -----"
 
   artifacts:
     when: always
