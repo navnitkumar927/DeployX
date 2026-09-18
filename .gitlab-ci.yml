@@ -1,17 +1,41 @@
 stages:
   - build
+  - security
 
 build-frontend:
   stage: build
-  image: node:22
+  tags:
+    - deployx
   script:
+    - node --version
+    - npm --version
     - npm ci
     - npm run build
 
 build-backend:
   stage: build
-  image: node:22
+  tags:
+    - deployx
   script:
     - cd server
+    - node --version
+    - npm --version
     - npm ci
     - npm run build
+
+sonarqube:
+  stage: security
+  tags:
+    - deployx
+  script:
+    - echo "Starting SonarQube analysis..."
+    - docker run --rm \
+        --network host \
+        -e SONAR_HOST_URL="$SONAR_HOST_URL" \
+        -e SONAR_TOKEN="$SONAR_TOKEN" \
+        -v "$CI_PROJECT_DIR:/usr/src" \
+        sonarsource/sonar-scanner-cli:latest \
+        -Dsonar.projectKey=DeployX \
+        -Dsonar.projectName=DeployX \
+        -Dsonar.sources=src,server \
+        -Dsonar.exclusions=node_modules/**,dist/**,coverage/**
