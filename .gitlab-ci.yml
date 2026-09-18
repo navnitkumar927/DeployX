@@ -66,17 +66,14 @@ owasp:
         -v owasp_data:/usr/share/dependency-check/data \
         -v "$CI_PROJECT_DIR:/src" \
         owasp/dependency-check:12.2.2 \
-        --scan /src \
+        --scan /src/package.json \
         --project "DeployX" \
         --format HTML \
         --format XML \
         --out /src/owasp-reports \
         --log /src/owasp-reports/dependency-check.log \
         --noupdate \
-        --disableOssIndex \
-        --exclude "/src/node_modules/**" \
-        --exclude "/src/dist/**" \
-        --exclude "/src/owasp-reports/**"
+        --disableOssIndex
     - echo "===== OWASP REPORTS ====="
     - ls -lah "$CI_PROJECT_DIR/owasp-reports"
 
