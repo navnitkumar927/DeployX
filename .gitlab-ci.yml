@@ -38,7 +38,7 @@ owasp:
   script:
     - echo "Starting OWASP Dependency-Check..."
     - mkdir -p "$CI_PROJECT_DIR/owasp-reports"
-    - docker run --rm -v owasp_data:/usr/share/dependency-check/data -v "$CI_PROJECT_DIR:/src" owasp/dependency-check:12.2.2 --noupdate --scan /src --project "DeployX" --format HTML --format JSON --out /src/owasp-reports --exclude /src/node_modules/** --exclude /src/dist/** --exclude /src/owasp-reports/**
+    - docker run --rm -v owasp_data:/usr/share/dependency-check/data -v "$CI_PROJECT_DIR:/src" owasp/dependency-check:12.2.2 --noupdate --scan /src --project "DeployX" --format HTML --out /src/owasp-reports --exclude /src/node_modules/** --exclude /src/dist/** --exclude /src/owasp-reports/**
   artifacts:
     when: always
     paths:
