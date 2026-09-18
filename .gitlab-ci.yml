@@ -46,15 +46,13 @@ owasp:
         --noupdate \
         --scan /src \
         --project "DeployX" \
-        --format XML \
+        --format JSON \
         --out /src/owasp-reports \
-        --log /src/owasp-reports/dependency-check.log \
         --exclude '/src/node_modules/**' \
         --exclude '/src/dist/**' \
         --exclude '/src/owasp-reports/**'
-    - echo "----- OWASP LOG -----"
-    - tail -100 "$CI_PROJECT_DIR/owasp-reports/dependency-check.log"
-    - echo "----- EXIT CODE -----"
+    - echo "----- OWASP REPORT -----"
+    - ls -lah "$CI_PROJECT_DIR/owasp-reports"
 
   artifacts:
     when: always
