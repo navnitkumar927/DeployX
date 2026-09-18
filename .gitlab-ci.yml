@@ -2,61 +2,94 @@ stages:
   - build
   - security
 
+# ============================================================
+# FRONTEND BUILD
+# ============================================================
 build-frontend:
   stage: build
   tags:
     - deployx
+
   script:
+    - echo "===== FRONTEND BUILD ====="
     - node --version
     - npm --version
     - npm ci
     - npm run build
 
+
+# ============================================================
+# BACKEND BUILD
+# ============================================================
 build-backend:
   stage: build
   tags:
     - deployx
+
   script:
+    - echo "===== BACKEND BUILD ====="
     - cd server
     - node --version
     - npm --version
     - npm ci
     - npm run build
 
+
+# ============================================================
+# SONARQUBE
+# ============================================================
 sonarqube:
   stage: security
   tags:
     - deployx
-  script:
-    - echo "Starting SonarQube analysis..."
-    - docker run --rm --network host -e SONAR_HOST_URL="$SONAR_HOST_URL" -e SONAR_TOKEN="$SONAR_TOKEN" -v "$CI_PROJECT_DIR:/usr/src" sonarsource/sonar-scanner-cli:latest -Dsonar.projectKey=DeployX -Dsonar.projectName=DeployX -Dsonar.sources=src,server -Dsonar.exclusions=node_modules/**,dist/**,coverage/**
 
+  script:
+    - echo "===== SONARQUBE ANALYSIS ====="
+    - |
+      docker run --rm \
+        --network host \
+        -e SONAR_HOST_URL="$SONAR_HOST_URL" \
+        -e SONAR_TOKEN="$SONAR_TOKEN" \
+        -v "$CI_PROJECT_DIR:/usr/src" \
+        sonarsource/sonar-scanner-cli:latest \
+        -Dsonar.projectKey=DeployX \
+        -Dsonar.projectName=DeployX \
+        -Dsonar.sources=src,server \
+        -Dsonar.exclusions=node_modules/**,dist/**,coverage/**
+
+
+# ============================================================
+# OWASP DEPENDENCY CHECK
+# ============================================================
 owasp:
   stage: security
   tags:
     - deployx
 
   script:
-    - echo "Starting OWASP Dependency-Check..."
+    - echo "===== OWASP DEPENDENCY CHECK ====="
+
     - rm -rf "$CI_PROJECT_DIR/owasp-reports"
     - mkdir -p "$CI_PROJECT_DIR/owasp-reports"
 
-    - docker run --rm \
+    - |
+      docker run --rm \
         --user "$(id -u):$(id -g)" \
         -v owasp_data:/usr/share/dependency-check/data \
         -v "$CI_PROJECT_DIR:/src" \
         owasp/dependency-check:12.2.2 \
-        --noupdate \
         --scan /src \
         --project "DeployX" \
         --format HTML \
         --format XML \
         --out /src/owasp-reports \
+        --log /src/owasp-reports/dependency-check.log \
+        --disableOssIndex \
         --exclude "/src/node_modules/**" \
         --exclude "/src/dist/**" \
         --exclude "/src/owasp-reports/**"
 
-    - echo "----- OWASP REPORT -----"
+    - echo "===== OWASP REPORTS ====="
     - ls -lah "$CI_PROJECT_DIR/owasp-reports"
 
   artifacts:
