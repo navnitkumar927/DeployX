@@ -29,13 +29,13 @@ sonarqube:
     - deployx
   script:
     - echo "Starting SonarQube analysis..."
-    - docker run --rm \
-        --network host \
-        -e SONAR_HOST_URL="$SONAR_HOST_URL" \
-        -e SONAR_TOKEN="$SONAR_TOKEN" \
-        -v "$CI_PROJECT_DIR:/usr/src" \
-        sonarsource/sonar-scanner-cli:latest \
-        -Dsonar.projectKey=DeployX \
-        -Dsonar.projectName=DeployX \
-        -Dsonar.sources=src,server \
-        -Dsonar.exclusions=node_modules/**,dist/**,coverage/**
+    - >
+      docker run --rm --network host
+      -e SONAR_HOST_URL="$SONAR_HOST_URL"
+      -e SONAR_TOKEN="$SONAR_TOKEN"
+      -v "$CI_PROJECT_DIR:/usr/src"
+      sonarsource/sonar-scanner-cli:latest
+      -Dsonar.projectKey=DeployX
+      -Dsonar.projectName=DeployX
+      -Dsonar.sources=src,server
+      -Dsonar.exclusions=node_modules/**,dist/**,coverage/**
