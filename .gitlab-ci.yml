@@ -39,9 +39,12 @@ owasp:
     - echo "Starting OWASP Dependency-Check..."
     - rm -rf "$CI_PROJECT_DIR/owasp-reports"
     - mkdir -p "$CI_PROJECT_DIR/owasp-reports"
-    - docker run --rm -v owasp_data:/usr/share/dependency-check/data -v "$CI_PROJECT_DIR:/src:ro" -v "$CI_PROJECT_DIR/owasp-reports:/report" owasp/dependency-check:12.2.2 --noupdate --scan /src --project "DeployX" --format HTML --out /report --exclude /src/node_modules/** --exclude /src/dist/** --exclude /src/owasp-reports/**
+    - docker run --rm -v owasp_data:/usr/share/dependency-check/data -v "$CI_PROJECT_DIR:/src:ro" -v "$CI_PROJECT_DIR/owasp-reports:/report" owasp/dependency-check:12.2.2 --noupdate --scan /src --project "DeployX" --format HTML --out /report/dependency-check-report.html --exclude /src/node_modules/** --exclude /src/dist/** --exclude /src/owasp-reports/**
+    - test -s "$CI_PROJECT_DIR/owasp-reports/dependency-check-report.html"
+    - ls -lh "$CI_PROJECT_DIR/owasp-reports"
+
   artifacts:
     when: always
     paths:
-      - owasp-reports/
+      - owasp-reports/dependency-check-report.html
     expire_in: 7 days
