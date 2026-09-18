@@ -36,14 +36,20 @@ owasp:
   tags:
     - deployx
   script:
-    - echo "Starting OWASP Dependency-Check..."
+    - echo "CI_COMMIT_SHA=$CI_COMMIT_SHA"
+    - echo "CI_COMMIT_REF_NAME=$CI_COMMIT_REF_NAME"
+    - echo "CI_PROJECT_DIR=$CI_PROJECT_DIR"
+    - echo "----- ACTUAL CI FILE -----"
+    - sed -n '/^owasp:/,$p' .gitlab-ci.yml
+    - echo "----- START OWASP -----"
     - rm -rf "$CI_PROJECT_DIR/owasp-reports"
     - mkdir -p "$CI_PROJECT_DIR/owasp-reports"
-    - docker run --rm -v owasp_data:/usr/share/dependency-check/data -v "$CI_PROJECT_DIR:/src" owasp/dependency-check:12.2.2 --noupdate --scan /src --project "DeployX" --format XML --out /src/owasp-reports --exclude '/src/node_modules/**' --exclude '/src/dist/**' --exclude '/src/owasp-reports/**'
-    - test -s "$CI_PROJECT_DIR/owasp-reports/dependency-check-report.xml"
+    - docker run --rm -v owasp_data:/usr/share/dependency-check/data -v "$CI_PROJECT_DIR:/src" -v "$CI_PROJECT_DIR/owasp-reports:/report" owasp/dependency-check:12.2.2 --noupdate --scan /src --project "DeployX" --format XML --out /report --exclude '/src/node_modules/**' --exclude '/src/dist/**' --exclude '/src/owasp-reports/**'
+    - echo "----- REPORTS -----"
+    - ls -lah "$CI_PROJECT_DIR/owasp-reports"
 
   artifacts:
     when: always
     paths:
-      - owasp-reports/dependency-check-report.xml
+      - owasp-reports/
     expire_in: 7 days
