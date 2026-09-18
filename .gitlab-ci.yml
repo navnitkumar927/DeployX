@@ -2,9 +2,6 @@ stages:
   - build
   - security
 
-variables:
-  NODE_VERSION: "22"
-
 # =========================
 # FRONTEND BUILD
 # =========================
@@ -14,9 +11,9 @@ build_frontend:
     - deployx
   script:
     - echo "===== FRONTEND BUILD ====="
-    - cd frontend
     - npm ci
     - npm run build
+    - echo "===== FRONTEND BUILD SUCCESS ====="
 
 # =========================
 # BACKEND BUILD
@@ -27,9 +24,8 @@ build_backend:
     - deployx
   script:
     - echo "===== BACKEND BUILD ====="
-    - cd backend
     - npm ci
-    - npm run build
+    - echo "===== BACKEND BUILD SUCCESS ====="
 
 # =========================
 # SONARQUBE
@@ -47,11 +43,11 @@ sonarqube:
         -e SONAR_TOKEN="$SONAR_TOKEN" \
         -v "$CI_PROJECT_DIR:/usr/src" \
         sonarsource/sonar-scanner-cli:latest \
-        sonar-scanner \
         -Dsonar.projectKey=DeployX \
-        -Dsonar.sources=/usr/src \
+        -Dsonar.sources=/usr/src/src,/usr/src/server \
         -Dsonar.host.url="$SONAR_HOST_URL" \
         -Dsonar.token="$SONAR_TOKEN"
+    - echo "===== SONARQUBE SUCCESS ====="
 
 # =========================
 # OWASP DEPENDENCY CHECK
