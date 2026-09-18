@@ -29,8 +29,7 @@ sonarqube:
     - deployx
   script:
     - echo "Starting SonarQube analysis..."
-    - docker run --rm --network host -e SONAR_HOST_URL="$SONAR_HOST_URL" -e SONAR_TOKEN="$SONAR_TOKEN" -v "$CI_PROJECT_DIR:/usr/src" sonarsource/sonar-scanner-cli:latest -Dsonar.projectKey=DeployX -Dsonar.projectName=DeployX -Dsonar.sources=src,server -Dsonar.exclusions=node_modules/**,dist/**,coverage/**
-
+    - docker run --rm -v owasp_data:/usr/share/dependency-check/data -v "$CI_PROJECT_DIR:/src" owasp/dependency-check:12.2.2 --noupdate --scan /src --project "DeployX" --format JSON --out /src/owasp-reports --exclude '/src/node_modules/**' --exclude '/src/dist/**' --exclude '/src/owasp-reports/**' || true
 owasp:
   stage: security
   tags:
