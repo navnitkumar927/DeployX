@@ -6,3 +6,8 @@ dist/
 .DS_Store
 *.log
 .bolt/
+
+# Terraform
+deployx-infrastructure/.terraform/
+deployx-infrastructure/terraform.tfstate
+deployx-infrastructure/terraform.tfstate.*

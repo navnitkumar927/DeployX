@@ -1,0 +1,11 @@
+aws_region        = "us-east-1"
+ami_id            = "ami-05a3e9423ae4d7a19"
+vpc_id            = "vpc-0c7071e81de8c6eb8"
+subnet_id         = "subnet-088263aacff9ab642"
+security_group_id = "sg-0e04eccf668393189"
+key_name          = "awskeyy"
+instance_type     = "t3.medium"
+project_name      = "DeployX"
+
+gitlab_repo = "https://gitlab.com/navnitkumar927/deployx.git"
+git_branch  = "main"
