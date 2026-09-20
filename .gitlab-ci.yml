@@ -78,18 +78,6 @@ owasp:
         --noupdate \
         --disableOssIndex
 
-    - echo "===== RESTORE REPORT OWNERSHIP ====="
-
-    - |
-      RUNNER_UID=$(id -u)
-      RUNNER_GID=$(id -g)
-
-      docker run --rm \
-        --entrypoint /bin/chown \
-        -v "$CI_PROJECT_DIR:/src" \
-        owasp/dependency-check:12.2.2 \
-        -R "$RUNNER_UID:$RUNNER_GID" /src/owasp-reports
-
     - echo "===== OWASP REPORTS ====="
     - ls -lah "$CI_PROJECT_DIR/owasp-reports"
 
