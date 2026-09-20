@@ -62,7 +62,7 @@ owasp:
     - mkdir -p "$CI_PROJECT_DIR/owasp-reports"
     - |
       docker run --rm \
-        --user "$(id -u):$(id -g)" \
+        --user "1000:1000" \
         -v owasp_data:/usr/share/dependency-check/data \
         -v "$CI_PROJECT_DIR:/src" \
         owasp/dependency-check:12.2.2 \
