@@ -52,33 +52,15 @@ sonarqube:
 # =========================
 # OWASP DEPENDENCY CHECK
 # =========================
-owasp:
-  stage: security
-  tags:
-    - deployx
-  script:
-    - echo "===== OWASP DEPENDENCY CHECK ====="
-    - rm -rf "$CI_PROJECT_DIR/owasp-reports"
-    - mkdir -p "$CI_PROJECT_DIR/owasp-reports"
-    - |
-      docker run --rm \
-        --user "1000:1000" \
-        -v owasp_data:/usr/share/dependency-check/data \
-        -v "$CI_PROJECT_DIR:/src" \
-        owasp/dependency-check:12.2.2 \
-        --scan /src/package.json \
-        --project "DeployX" \
-        --format HTML \
-        --format XML \
-        --out /src/owasp-reports \
-        --log /src/owasp-reports/dependency-check.log \
-        --noupdate \
-        --disableOssIndex
-    - echo "===== OWASP REPORTS ====="
-    - ls -lah "$CI_PROJECT_DIR/owasp-reports"
-
-  artifacts:
-    when: always
-    paths:
-      - owasp-reports/
-    expire_in: 7 days
+docker run --rm \
+  --user "1000:1000" \
+  -v owasp_data:/usr/share/dependency-check/data \
+  -v "$CI_PROJECT_DIR:/src" \
+  owasp/dependency-check:12.2.2 \
+  --scan /src/package.json \
+  --project "DeployX" \
+  --format HTML \
+  --out /src/owasp-reports \
+  --log /src/owasp-reports/dependency-check.log \
+  --noupdate \
+  --disableOssIndex
