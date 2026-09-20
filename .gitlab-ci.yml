@@ -54,6 +54,7 @@ sonarqube:
 # =========================
 owasp:
   stage: security
+
   tags:
     - deployx
 
@@ -61,8 +62,6 @@ owasp:
     - echo "===== OWASP DEPENDENCY CHECK ====="
     - rm -rf "$CI_PROJECT_DIR/owasp-reports"
     - mkdir -p "$CI_PROJECT_DIR/owasp-reports"
-
-    # Allow OWASP container user (1000:1000) to write reports
     - chmod 777 "$CI_PROJECT_DIR/owasp-reports"
 
     - |
@@ -79,8 +78,17 @@ owasp:
         --noupdate \
         --disableOssIndex
 
-    # Give workspace ownership back to GitLab Runner
-    - chmod -R u+rwX,go+rX "$CI_PROJECT_DIR/owasp-reports"
+    - echo "===== RESTORE REPORT OWNERSHIP ====="
+
+    - |
+      RUNNER_UID=$(id -u)
+      RUNNER_GID=$(id -g)
+
+      docker run --rm \
+        --entrypoint /bin/chown \
+        -v "$CI_PROJECT_DIR:/src" \
+        owasp/dependency-check:12.2.2 \
+        -R "$RUNNER_UID:$RUNNER_GID" /src/owasp-reports
 
     - echo "===== OWASP REPORTS ====="
     - ls -lah "$CI_PROJECT_DIR/owasp-reports"
