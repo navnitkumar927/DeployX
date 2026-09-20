@@ -56,10 +56,15 @@ owasp:
   stage: security
   tags:
     - deployx
+
   script:
     - echo "===== OWASP DEPENDENCY CHECK ====="
     - rm -rf "$CI_PROJECT_DIR/owasp-reports"
     - mkdir -p "$CI_PROJECT_DIR/owasp-reports"
+
+    # Allow OWASP container user (1000:1000) to write reports
+    - chmod 777 "$CI_PROJECT_DIR/owasp-reports"
+
     - |
       docker run --rm \
         --user "1000:1000" \
@@ -73,6 +78,10 @@ owasp:
         --log /src/owasp-reports/dependency-check.log \
         --noupdate \
         --disableOssIndex
+
+    # Give workspace ownership back to GitLab Runner
+    - chmod -R u+rwX,go+rX "$CI_PROJECT_DIR/owasp-reports"
+
     - echo "===== OWASP REPORTS ====="
     - ls -lah "$CI_PROJECT_DIR/owasp-reports"
 
