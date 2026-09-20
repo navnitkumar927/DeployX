@@ -86,3 +86,17 @@ owasp:
     paths:
       - owasp-reports/
     expire_in: 7 days
+
+trivy:
+  stage: security
+
+  tags:
+    - deployx
+
+  script:
+    - echo "===== TRIVY DOCKER IMAGE SCAN ====="
+    - docker build -t deployx-backend:ci -f Dockerfile.backend .
+    - trivy image --exit-code 1 --severity HIGH,CRITICAL deployx-backend:ci
+
+  after_script:
+    - docker image rm -f deployx-backend:ci || true
