@@ -179,38 +179,249 @@ DeployX follows a modular architecture designed to separate the frontend, persis
 ```text
 DeployX/
 │
-├── src/
-│   ├── components/
-│   ├── pages/
-│   ├── services/
-│   │   ├── mockWorkspace.ts
-│   │   └── workspace.ts
-│   ├── hooks/
-│   ├── types/
-│   └── ...
+├── .github/
+│   └── workflows/
+│       ├── ci.yml
+│       ├── cd.yml
+│       ├── security.yml
+│       └── terraform.yml
 │
-├── server/
-│
-├── supabase/
-│   └── migrations/
+├── .gitlab/
+│   └── ci/
+│       └── templates/
 │
 ├── public/
+│   ├── images/
+│   ├── icons/
+│   └── favicon.ico
 │
+├── src/
+│   ├── assets/
+│   │   ├── images/
+│   │   ├── icons/
+│   │   └── styles/
+│   │
+│   ├── components/
+│   │   ├── common/
+│   │   ├── layout/
+│   │   ├── dashboard/
+│   │   ├── workspace/
+│   │   └── ui/
+│   │
+│   ├── pages/
+│   │   ├── auth/
+│   │   ├── dashboard/
+│   │   ├── workspace/
+│   │   ├── settings/
+│   │   └── error/
+│   │
+│   ├── hooks/
+│   │   ├── useAuth.ts
+│   │   ├── useWorkspace.ts
+│   │   └── useApi.ts
+│   │
+│   ├── services/
+│   │   ├── api/
+│   │   │   ├── client.ts
+│   │   │   ├── auth.ts
+│   │   │   ├── workspace.ts
+│   │   │   └── users.ts
+│   │   │
+│   │   ├── supabase/
+│   │   │   ├── client.ts
+│   │   │   └── auth.ts
+│   │   │
+│   │   └── mock/
+│   │       └── mockWorkspace.ts
+│   │
+│   ├── store/
+│   │   ├── authStore.ts
+│   │   ├── workspaceStore.ts
+│   │   └── appStore.ts
+│   │
+│   ├── types/
+│   │   ├── auth.ts
+│   │   ├── user.ts
+│   │   ├── workspace.ts
+│   │   └── api.ts
+│   │
+│   ├── utils/
+│   │   ├── constants.ts
+│   │   ├── helpers.ts
+│   │   ├── validation.ts
+│   │   └── formatters.ts
+│   │
+│   ├── routes/
+│   │   └── index.tsx
+│   │
+│   ├── App.tsx
+│   ├── main.tsx
+│   └── index.css
+│
+├── server/
+│   ├── src/
+│   │   ├── config/
+│   │   │   ├── env.ts
+│   │   │   └── database.ts
+│   │   │
+│   │   ├── controllers/
+│   │   │   ├── auth.controller.ts
+│   │   │   ├── user.controller.ts
+│   │   │   └── workspace.controller.ts
+│   │   │
+│   │   ├── routes/
+│   │   │   ├── auth.routes.ts
+│   │   │   ├── user.routes.ts
+│   │   │   └── workspace.routes.ts
+│   │   │
+│   │   ├── services/
+│   │   │   ├── auth.service.ts
+│   │   │   ├── user.service.ts
+│   │   │   └── workspace.service.ts
+│   │   │
+│   │   ├── middleware/
+│   │   │   ├── auth.middleware.ts
+│   │   │   ├── error.middleware.ts
+│   │   │   └── rateLimit.middleware.ts
+│   │   │
+│   │   ├── models/
+│   │   │   ├── user.model.ts
+│   │   │   └── workspace.model.ts
+│   │   │
+│   │   ├── utils/
+│   │   │   ├── logger.ts
+│   │   │   └── response.ts
+│   │   │
+│   │   ├── app.ts
+│   │   └── server.ts
+│   │
+│   ├── tests/
+│   │   ├── unit/
+│   │   └── integration/
+│   │
+│   ├── package.json
+│   └── tsconfig.json
+│
+├── supabase/
+│   ├── migrations/
+│   │   ├── 001_initial_schema.sql
+│   │   ├── 002_users.sql
+│   │   └── 003_workspaces.sql
+│   │
+│   ├── functions/
+│   │   ├── auth/
+│   │   └── workspace/
+│   │
+│   ├── seed.sql
+│   └── config.toml
+│
+├── deployx-infrastructure/
+│   ├── environments/
+│   │   ├── dev/
+│   │   │   ├── main.tf
+│   │   │   ├── variables.tf
+│   │   │   ├── outputs.tf
+│   │   │   └── terraform.tfvars.example
+│   │   │
+│   │   ├── staging/
+│   │   │   └── ...
+│   │   │
+│   │   └── production/
+│   │       └── ...
+│   │
+│   ├── modules/
+│   │   ├── network/
+│   │   ├── compute/
+│   │   ├── database/
+│   │   ├── security/
+│   │   └── monitoring/
+│   │
+│   ├── backend.tf
+│   ├── providers.tf
+│   └── README.md
+│
+├── docker/
+│   ├── frontend/
+│   │   └── Dockerfile
+│   │
+│   ├── backend/
+│   │   └── Dockerfile
+│   │
+│   └── nginx/
+│       └── nginx.conf
+│
+├── nginx/
+│   ├── nginx.conf
+│   ├── conf.d/
+│   │   ├── frontend.conf
+│   │   └── backend.conf
+│   └── ssl/
+│
+├── scripts/
+│   ├── build.sh
+│   ├── deploy.sh
+│   ├── backup.sh
+│   ├── restore.sh
+│   └── health-check.sh
+│
+├── tests/
+│   ├── e2e/
+│   ├── integration/
+│   └── fixtures/
+│
+├── docs/
+│   ├── architecture/
+│   │   ├── architecture.md
+│   │   └── diagrams/
+│   │
+│   ├── deployment/
+│   │   ├── development.md
+│   │   ├── staging.md
+│   │   └── production.md
+│   │
+│   ├── database/
+│   │   └── database.md
+│   │
+│   ├── api/
+│   │   └── api.md
+│   │
+│   └── security/
+│       └── security.md
+│
+├── monitoring/
+│   ├── prometheus/
+│   │   └── prometheus.yml
+│   │
+│   └── grafana/
+│       ├── dashboards/
+│       └── provisioning/
+│
+├── security/
+│   ├── trivy/
+│   ├── sonarqube/
+│   ├── dependency-check/
+│   └── zap/
+│
+├── .dockerignore
+├── .env.example
+├── .gitignore
+├── .gitlab-ci.yml
+├── docker-compose.yml
 ├── Dockerfile.frontend
 ├── Dockerfile.backend
-├── docker-compose.yml
+├── eslint.config.js
+├── index.html
 ├── nginx.conf
-│
 ├── package.json
 ├── package-lock.json
-├── vite.config.ts
-├── tailwind.config.ts
+├── postcss.config.js
+├── tailwind.config.js
 ├── tsconfig.json
-├── eslint.config.js
-│
-├── .env.example
-└── README.md
-```
+├── tsconfig.app.json
+├── tsconfig.node.json
+├── vite.config.ts
+├── README.md
+└── LICENSE
 
 ---
 
