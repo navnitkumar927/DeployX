@@ -1,176 +1,376 @@
 # 🚀 DeployX
 
-### Production-Minded DevOps Deployment & Infrastructure Platform
+### DevOps / DevSecOps Deployment & Infrastructure Platform
 
-DeployX is a modern DevOps platform designed to give development and infrastructure teams a **single, centralized view of applications, deployments, CI/CD pipelines, Docker images, cloud infrastructure, logs, and incidents**.
+DeployX is a portfolio-grade DevOps/DevSecOps platform that brings **application deployment, CI/CD, container security, infrastructure automation, code quality, and infrastructure monitoring** together around a containerized full-stack application.
 
-The platform provides a developer-tool-style dashboard with a responsive dark interface and includes **clearly labelled demo data and a simulated deployment pipeline**, allowing the project to be demonstrated without requiring live AWS, GitHub, or Docker Registry credentials.
+The GitHub environment uses **GitHub Actions for CI/security validation**, **Jenkins for deployment automation**, **Docker Compose for runtime orchestration**, **Terraform for AWS infrastructure**, **SonarQube**, **OWASP Dependency-Check**, **Trivy**, **Prometheus**, **Grafana**, **Node Exporter**, and **Nginx**.
 
 ---
 
-## ✨ Features
-
-### 📊 Deployment Dashboard
-
-* Application deployment overview
-* Availability and deployment metrics
-* Resource monitoring
-* Recent deployment activity
-* Service health visibility
-
-### 📦 Application Management
-
-* Application listing and details
-* Deployment history
-* Application status
-* Environment information
-* Deployment detail drawers
-
-### 🔄 CI/CD Pipeline
-
-Visualize the complete deployment workflow:
+## 🏗️ Architecture
 
 ```text
-GitHub Push
-     ↓
-CI/CD Runner
-     ↓
-Build & Test
-     ↓
-Docker Image
-     ↓
-Private Registry
-     ↓
-EC2 Deployment
-     ↓
-Container Restart
-     ↓
+Developer
+   │
+   ▼
+GitHub Repository
+   │
+   ▼
+GitHub Actions
+   ├── Frontend Build
+   ├── Backend Build
+   ├── SonarQube
+   ├── OWASP Dependency-Check
+   └── Trivy
+   │
+   ▼
+Pipeline Passed
+   │
+   ▼
+Jenkins DeployX-CD
+   │
+   ├── git pull origin main
+   ├── docker compose build
+   └── docker compose up -d
+   │
+   ▼
+AWS EC2
+   │
+   ├── Nginx :80
+   ├── Frontend :8080
+   ├── Backend :8080 (internal)
+   ├── Jenkins :8081
+   ├── SonarQube :9000
+   ├── Prometheus :9090
+   ├── Grafana :3000
+   └── Node Exporter :9100
+```
+
+---
+
+## ✨ Key Features
+
+* GitHub source control
+* GitHub Actions CI/CD
+* Automated frontend and backend builds
+* Docker and Docker Compose
+* AWS EC2 deployment
+* Terraform infrastructure provisioning
+* Jenkins deployment automation
+* SonarQube code-quality analysis
+* OWASP Dependency-Check
+* Trivy container vulnerability scanning
+* Nginx reverse proxy
+* Prometheus metrics collection
+* Grafana dashboards
+* Node Exporter host monitoring
+* Backend health checks
+* SSH-based GitHub access for Jenkins
+* Non-root backend container execution
+* Environment-based configuration
+
+---
+
+# 🔄 CI/CD Pipeline
+
+```text
+Git Push
+   │
+   ▼
+┌─────────────────────┐
+│       BUILD         │
+│ Frontend + Backend  │
+└──────────┬──────────┘
+           │
+           ▼
+┌─────────────────────┐
+│      SECURITY       │
+│                     │
+│ SonarQube            │
+│ OWASP                │
+│ Trivy                │
+└──────────┬──────────┘
+           │
+           ▼
+    Pipeline Passed
+           │
+           ▼
+       Jenkins CD
+           │
+           ▼
+    Docker Compose
+           │
+           ▼
+      Health Check
+```
+
+### GitHub Actions Jobs
+
+| Stage    | Job              | Purpose                                    |
+| -------- | ---------------- | ------------------------------------------ |
+| Build    | `build_frontend` | Builds the Vite frontend                   |
+| Build    | `build_backend`  | Builds the backend                         |
+| Security | `sonarqube`      | Static code-quality/security analysis      |
+| Security | `owasp`          | Dependency vulnerability analysis          |
+| Security | `trivy`          | HIGH/CRITICAL container vulnerability scan |
+
+The CI pipeline validates the application before deployment.
+
+---
+
+# 🚀 Jenkins CD
+
+Jenkins is responsible for deployment automation.
+
+The `DeployX-CD` pipeline performs:
+
+```text
+GitHub
+   ↓
+git pull origin main
+   ↓
+docker compose build
+   ↓
+docker compose up -d
+   ↓
+docker compose ps
+   ↓
 Health Check
-     ↓
-Deployment Successful
 ```
 
-The current application includes a **simulated pipeline runner** for demonstration purposes.
+Jenkins has Docker access and uses an SSH key registered with GitHub for repository access.
 
-### 🐳 Docker Registry
+**Jenkins:** `:8081`
 
-* Docker image inventory
-* Image version history
-* Immutable image tags
-* Commit SHA based image identification
-* Registry deployment workflow
+The deployment pipeline has been successfully verified using Jenkins **Build Now**.
 
-### ☁️ AWS Infrastructure
+### Automated Webhook Deployment
 
-* EC2 server monitoring
-* Server health information
-* Resource visibility
-* Deployment target management
-
-### 📋 Logs
-
-* Searchable deployment logs
-* Service logs
-* Deployment activity
-* Error and operational information
-
-### 🚨 Incident Management
-
-* Incident tracking
-* Severity levels
-* Ownership
-* Incident status
-* Operational visibility
-
-### ⚙️ Workspace & Integrations
-
-* Workspace profile
-* Connected-service settings
-* Supabase authentication
-* Supabase database integration
-
----
-
-# 🏗️ Architecture
-
-DeployX follows a modular architecture designed to separate the frontend, persistence layer, and future infrastructure integrations.
+The next stage is connecting GitHub webhooks to Jenkins:
 
 ```text
-                         ┌─────────────────────┐
-                         │      Developer      │
-                         └──────────┬──────────┘
-                                    │
-                                    │ Git Push
-                                    ▼
-                         ┌─────────────────────┐
-                         │       GitHub        │
-                         └──────────┬──────────┘
-                                    │
-                                    ▼
-                         ┌─────────────────────┐
-                         │    CI/CD Runner     │
-                         │                     │
-                         │ Build → Test → Scan │
-                         └──────────┬──────────┘
-                                    │
-                                    ▼
-                         ┌─────────────────────┐
-                         │   Docker Registry   │
-                         │                     │
-                         │ SHA Tag + Latest    │
-                         └──────────┬──────────┘
-                                    │
-                                    ▼
-                         ┌─────────────────────┐
-                         │      AWS EC2        │
-                         │                     │
-                         │ Pull → Restart      │
-                         │ → Health Check      │
-                         └──────────┬──────────┘
-                                    │
-                                    ▼
-                         ┌─────────────────────┐
-                         │      DeployX        │
-                         │     Dashboard       │
-                         └─────────────────────┘
+Developer
+    ↓
+git push origin main
+    ↓
+GitHub
+    ↓
+Webhook
+    ↓
+Jenkins
+    ↓
+Docker Compose
+    ↓
+Live Deployment
 ```
+
+A publicly reachable Jenkins endpoint is required for GitHub to deliver webhooks from the public Internet.
 
 ---
 
-# 🧰 Tech Stack
+# ☁️ Terraform + AWS
+
+Terraform provisions the AWS infrastructure and bootstraps the EC2 environment.
+
+Infrastructure code:
+
+```text
+deployx-infrastructure/
+```
+
+Typical flow:
+
+```text
+Terraform
+    ↓
+AWS EC2
+    ↓
+Bootstrap / User Data
+    ↓
+Docker + Docker Compose
+    ↓
+DeployX
+```
+
+Terraform is used to manage infrastructure as code instead of manually creating the environment.
+
+---
+
+# 🐳 Docker
+
+DeployX uses separate frontend and backend containers.
 
 ## Frontend
 
 * React
-* TypeScript
 * Vite
-* Tailwind CSS
-* ESLint
-
-## Backend / Data
-
-* Supabase
-* PostgreSQL
-* Supabase Authentication
-* Row Level Security (RLS)
-
-## DevOps
-
-* Docker
-* Docker Compose
+* TypeScript
 * Nginx
-* GitHub
-* CI/CD
-* AWS EC2
-* SSH
-* Private Docker Registry
+* Production build
+* Health endpoint
+* Security-oriented headers
 
-## Infrastructure
+## Backend
 
-* AWS EC2
-* Containerized workloads
-* Immutable Docker image deployments
-* Health checks
+* Node.js
+* TypeScript
+* Production dependencies
+* Non-root `node` user
+* `/healthz` endpoint
+* Internal Docker networking
+
+## Docker Compose
+
+Start:
+
+```bash
+docker compose up --build -d
+```
+
+Check:
+
+```bash
+docker compose ps
+```
+
+Logs:
+
+```bash
+docker compose logs -f
+```
+
+Stop:
+
+```bash
+docker compose down
+```
+
+---
+
+# 🔐 DevSecOps Security
+
+## SonarQube
+
+SonarQube performs static code-quality and security analysis.
+
+Current verified status:
+
+```text
+Project: DeployX
+Quality Gate: Passed
+```
+
+---
+
+## OWASP Dependency-Check
+
+OWASP Dependency-Check scans project dependencies for known vulnerabilities.
+
+Reports are generated under:
+
+```text
+owasp-reports/
+```
+
+---
+
+## Trivy
+
+Trivy scans the backend Docker image for container vulnerabilities.
+
+Latest verified result:
+
+```text
+HIGH:     0
+CRITICAL: 0
+```
+
+---
+
+# 📊 Monitoring & Observability
+
+DeployX uses **Prometheus, Node Exporter, and Grafana** for infrastructure monitoring.
+
+```text
+Node Exporter
+      │
+      ▼
+ Prometheus
+      │
+      ▼
+   Grafana
+```
+
+| Component     |   Port | Purpose                     |
+| ------------- | -----: | --------------------------- |
+| Node Exporter | `9100` | EC2 host metrics            |
+| Prometheus    | `9090` | Metrics collection/querying |
+| Grafana       | `3000` | Monitoring dashboards       |
+
+Prometheus scrapes Node Exporter metrics and Grafana visualizes the collected data.
+
+The **Node Exporter Full** dashboard provides visibility into:
+
+* CPU
+* Memory
+* Disk
+* Network
+* Load
+* Uptime
+
+---
+
+# 🌐 Nginx
+
+Nginx provides the HTTP reverse-proxy layer.
+
+```text
+Client
+   ↓
+Nginx :80
+   ↓
+DeployX Frontend :8080
+```
+
+The frontend container also uses Nginx to serve the production React application.
+
+---
+
+# 🗄️ Application & Data
+
+DeployX contains:
+
+* React + TypeScript frontend
+* Node.js backend
+* Supabase integration boundary
+* PostgreSQL data model
+* Authentication support
+* Row Level Security support
+* Demo-oriented application data
+
+Example environment variables:
+
+```env
+VITE_SUPABASE_URL=your_supabase_project_url
+VITE_SUPABASE_ANON_KEY=your_supabase_anon_key
+```
+
+### Never commit secrets
+
+```text
+.env
+AWS credentials
+GitHub tokens
+GitLab tokens
+Docker registry credentials
+SSH private keys
+Database passwords
+Supabase service-role keys
+API secrets
+```
+
+Use GitHub Secrets or environment variables for sensitive configuration.
 
 ---
 
@@ -178,711 +378,238 @@ DeployX follows a modular architecture designed to separate the frontend, persis
 
 ```text
 DeployX/
-│
-├── .github/
-│   └── workflows/
-│       ├── ci.yml
-│       ├── cd.yml
-│       ├── security.yml
-│       └── terraform.yml
-│
-├── .gitlab/
-│   └── ci/
-│       └── templates/
-│
-├── public/
-│   ├── images/
-│   ├── icons/
-│   └── favicon.ico
-│
-├── src/
-│   ├── assets/
-│   │   ├── images/
-│   │   ├── icons/
-│   │   └── styles/
-│   │
-│   ├── components/
-│   │   ├── common/
-│   │   ├── layout/
-│   │   ├── dashboard/
-│   │   ├── workspace/
-│   │   └── ui/
-│   │
-│   ├── pages/
-│   │   ├── auth/
-│   │   ├── dashboard/
-│   │   ├── workspace/
-│   │   ├── settings/
-│   │   └── error/
-│   │
-│   ├── hooks/
-│   │   ├── useAuth.ts
-│   │   ├── useWorkspace.ts
-│   │   └── useApi.ts
-│   │
-│   ├── services/
-│   │   ├── api/
-│   │   │   ├── client.ts
-│   │   │   ├── auth.ts
-│   │   │   ├── workspace.ts
-│   │   │   └── users.ts
-│   │   │
-│   │   ├── supabase/
-│   │   │   ├── client.ts
-│   │   │   └── auth.ts
-│   │   │
-│   │   └── mock/
-│   │       └── mockWorkspace.ts
-│   │
-│   ├── store/
-│   │   ├── authStore.ts
-│   │   ├── workspaceStore.ts
-│   │   └── appStore.ts
-│   │
-│   ├── types/
-│   │   ├── auth.ts
-│   │   ├── user.ts
-│   │   ├── workspace.ts
-│   │   └── api.ts
-│   │
-│   ├── utils/
-│   │   ├── constants.ts
-│   │   ├── helpers.ts
-│   │   ├── validation.ts
-│   │   └── formatters.ts
-│   │
-│   ├── routes/
-│   │   └── index.tsx
-│   │
-│   ├── App.tsx
-│   ├── main.tsx
-│   └── index.css
-│
-├── server/
-│   ├── src/
-│   │   ├── config/
-│   │   │   ├── env.ts
-│   │   │   └── database.ts
-│   │   │
-│   │   ├── controllers/
-│   │   │   ├── auth.controller.ts
-│   │   │   ├── user.controller.ts
-│   │   │   └── workspace.controller.ts
-│   │   │
-│   │   ├── routes/
-│   │   │   ├── auth.routes.ts
-│   │   │   ├── user.routes.ts
-│   │   │   └── workspace.routes.ts
-│   │   │
-│   │   ├── services/
-│   │   │   ├── auth.service.ts
-│   │   │   ├── user.service.ts
-│   │   │   └── workspace.service.ts
-│   │   │
-│   │   ├── middleware/
-│   │   │   ├── auth.middleware.ts
-│   │   │   ├── error.middleware.ts
-│   │   │   └── rateLimit.middleware.ts
-│   │   │
-│   │   ├── models/
-│   │   │   ├── user.model.ts
-│   │   │   └── workspace.model.ts
-│   │   │
-│   │   ├── utils/
-│   │   │   ├── logger.ts
-│   │   │   └── response.ts
-│   │   │
-│   │   ├── app.ts
-│   │   └── server.ts
-│   │
-│   ├── tests/
-│   │   ├── unit/
-│   │   └── integration/
-│   │
-│   ├── package.json
-│   └── tsconfig.json
-│
-├── supabase/
-│   ├── migrations/
-│   │   ├── 001_initial_schema.sql
-│   │   ├── 002_users.sql
-│   │   └── 003_workspaces.sql
-│   │
-│   ├── functions/
-│   │   ├── auth/
-│   │   └── workspace/
-│   │
-│   ├── seed.sql
-│   └── config.toml
-│
-├── deployx-infrastructure/
-│   ├── environments/
-│   │   ├── dev/
-│   │   │   ├── main.tf
-│   │   │   ├── variables.tf
-│   │   │   ├── outputs.tf
-│   │   │   └── terraform.tfvars.example
-│   │   │
-│   │   ├── staging/
-│   │   │   └── ...
-│   │   │
-│   │   └── production/
-│   │       └── ...
-│   │
-│   ├── modules/
-│   │   ├── network/
-│   │   ├── compute/
-│   │   ├── database/
-│   │   ├── security/
-│   │   └── monitoring/
-│   │
-│   ├── backend.tf
-│   ├── providers.tf
-│   └── README.md
-│
-├── docker/
-│   ├── frontend/
-│   │   └── Dockerfile
-│   │
-│   ├── backend/
-│   │   └── Dockerfile
-│   │
-│   └── nginx/
-│       └── nginx.conf
-│
-├── nginx/
-│   ├── nginx.conf
-│   ├── conf.d/
-│   │   ├── frontend.conf
-│   │   └── backend.conf
-│   └── ssl/
-│
+├── src/                       # React + TypeScript frontend
+├── server/                    # Node.js backend
+├── supabase/                  # Database migrations
+├── deployx-infrastructure/    # Terraform
+├── monitoring/                # Prometheus/Grafana configuration
+├── security/                  # Security tooling/configuration
 ├── scripts/
-│   ├── build.sh
-│   ├── deploy.sh
-│   ├── backup.sh
-│   ├── restore.sh
-│   └── health-check.sh
-│
-├── tests/
-│   ├── e2e/
-│   ├── integration/
-│   └── fixtures/
-│
 ├── docs/
-│   ├── architecture/
-│   │   ├── architecture.md
-│   │   └── diagrams/
-│   │
-│   ├── deployment/
-│   │   ├── development.md
-│   │   ├── staging.md
-│   │   └── production.md
-│   │
-│   ├── database/
-│   │   └── database.md
-│   │
-│   ├── api/
-│   │   └── api.md
-│   │
-│   └── security/
-│       └── security.md
-│
-├── monitoring/
-│   ├── prometheus/
-│   │   └── prometheus.yml
-│   │
-│   └── grafana/
-│       ├── dashboards/
-│       └── provisioning/
-│
-├── security/
-│   ├── trivy/
-│   ├── sonarqube/
-│   ├── dependency-check/
-│   └── zap/
-│
-├── .dockerignore
-├── .env.example
-├── .gitignore
-├── .gitlab-ci.yml
-├── docker-compose.yml
+├── tests/
 ├── Dockerfile.frontend
 ├── Dockerfile.backend
-├── eslint.config.js
-├── index.html
+├── docker-compose.yml
 ├── nginx.conf
+├── .github/
+│   └── workflows/             # GitHub Actions workflows
 ├── package.json
 ├── package-lock.json
-├── postcss.config.js
-├── tailwind.config.js
-├── tsconfig.json
-├── tsconfig.app.json
-├── tsconfig.node.json
-├── vite.config.ts
-├── README.md
-└── LICENSE
-
----
-
-# 🔐 Data & Authentication Architecture
-
-Supabase provides the persistence and authentication layer when the project is connected to a Supabase instance.
-
-The database contains entities for:
-
-* Profiles
-* Applications
-* Deployments
-* Pipelines
-* Docker images
-* Servers
-* Logs
-* Incidents
-
-Row Level Security (RLS) policies are enabled to provide workspace-level data protection.
-
-The project also includes database triggers for:
-
-* Profile creation
-* Automatic timestamp updates
-
----
-
-# 🧪 Demo Mode
-
-DeployX is designed to be demonstrated without connecting external infrastructure.
-
-The current UI uses intentionally created demo data from:
-
-```text
-src/services/mockWorkspace.ts
-```
-
-The Supabase integration boundary is:
-
-```text
-src/services/workspace.ts
-```
-
-The integration layer is typed and returns no workspace data until the required public Supabase environment variables are configured.
-
-This architecture provides two benefits:
-
-1. The application can be demonstrated without credentials.
-2. Production integrations have a clearly defined service boundary.
-
----
-
-# 🔄 Production Deployment Strategy
-
-The intended production deployment strategy uses **immutable Docker images**.
-
-```text
-Developer
-   │
-   ▼
-GitHub Push
-   │
-   ▼
-CI/CD Pipeline
-   │
-   ├── Install Dependencies
-   ├── Lint
-   ├── Test
-   ├── Build
-   └── Security Scanning
-   │
-   ▼
-Docker Build
-   │
-   ▼
-Image Tagging
-   │
-   ├── <commit-sha>
-   └── latest
-   │
-   ▼
-Private Docker Registry
-   │
-   ▼
-AWS EC2
-   │
-   ├── Pull Image
-   ├── Stop Old Container
-   ├── Start New Container
-   └── Health Check
-   │
-   ▼
-Deployment Completed
-```
-
-### Why use commit SHA tags?
-
-Instead of deploying only:
-
-```text
-latest
-```
-
-DeployX promotes immutable images such as:
-
-```text
-deployx:8f3a91c
-```
-
-This makes deployments easier to:
-
-* Identify
-* Audit
-* Reproduce
-* Roll back
-
-The same image can be promoted through environments:
-
-```text
-Build
-  ↓
-Staging
-  ↓
-Production
+└── README.md
 ```
 
 ---
 
-# 🐳 Docker
+# 🧪 Local Development
 
-DeployX provides separate Dockerfiles for the frontend and backend.
-
-## Frontend
-
-`Dockerfile.frontend` uses a multi-stage build and an unprivileged Nginx image.
-
-It provides:
-
-* Production frontend build
-* SPA routing fallback
-* Static asset caching
-* Compression
-* Security headers
-* Health endpoint
-* Non-root Nginx execution
-
-## Backend
-
-`Dockerfile.backend` runs using the Node.js `node` user.
-
-The current backend exposes:
-
-```text
-/healthz
-```
-
-as the initial health endpoint.
-
----
-
-# 🐳 Docker Compose
-
-The project includes:
-
-```text
-docker-compose.yml
-```
-
-The containerized stack starts the frontend on:
-
-```text
-http://localhost:8080
-```
-
-The backend remains an internal service and is **not directly published to the host**.
-
-The frontend waits for backend health before becoming available.
-
-Start the complete stack with:
+## Clone
 
 ```bash
-docker compose up --build
-```
-
-Run in detached mode:
-
-```bash
-docker compose up --build -d
-```
-
-Check running containers:
-
-```bash
-docker compose ps
-```
-
-View logs:
-
-```bash
-docker compose logs -f
-```
-
-Stop the stack:
-
-```bash
-docker compose down
-```
-
----
-
-# 💻 Local Development
-
-## 1. Clone the repository
-
-```bash
-git clone <YOUR_REPOSITORY_URL>
+git clone git@github.com:navnitkumar927/DeployX.git
 cd DeployX
 ```
 
-## 2. Install dependencies
+## Install
 
 ```bash
 npm install
 ```
 
-## 3. Configure environment variables
-
-Create a local environment file:
+## Environment
 
 ```bash
 cp .env.example .env
 ```
 
-Add the required Supabase project values.
+Add the required public configuration values.
 
-## 4. Start development server
+## Run
 
 ```bash
 npm run dev
 ```
 
-The Vite development server will display the local URL in the terminal.
+## Build
 
----
-
-# 🔑 Environment Variables
-
-Create a `.env` file locally.
-
-Example:
-
-```env
-VITE_SUPABASE_URL=your_supabase_project_url
-VITE_SUPABASE_ANON_KEY=your_supabase_anon_key
+```bash
+npm run build
 ```
 
-> ⚠️ Never commit real credentials to Git.
+## Lint
 
-Do not commit:
-
-```text
-.env
-.env.local
-AWS credentials
-AWS access keys
-GitHub tokens
-GitLab tokens
-Docker registry tokens
-SSH private keys
-Supabase service-role keys
-Database passwords
-API secrets
+```bash
+npm run lint
 ```
-
-Only commit safe example configuration such as:
-
-```text
-.env.example
-```
-
----
-
-# 🗄️ Database Setup
-
-The project includes a Supabase migration:
-
-```text
-create_deployx_schema
-```
-
-The migration creates the core DeployX database structure including:
-
-* Application tables
-* Deployment tables
-* Pipeline tables
-* Docker image records
-* Server records
-* Logs
-* Incidents
-* Profiles
-* Indexes
-* Row Level Security policies
-* Profile creation trigger
-* Timestamp triggers
-
-Apply the migration using your configured Supabase workflow.
-
----
-
-# 🔒 Security Principles
-
-DeployX follows several production-oriented security practices.
-
-### Application
-
-* Typed service boundaries
-* Environment-based configuration
-* No hard-coded secrets
-* Authentication through Supabase
-* Row Level Security
-
-### Docker
-
-* Multi-stage frontend build
-* Non-root container execution
-* Minimal runtime image
-* Internal backend networking
-
-### Deployment
-
-* Immutable image tags
-* Commit SHA deployments
-* Health verification
-* Controlled image promotion
-* SSH-based EC2 deployment
-
----
-
-# 📈 Future Improvements
-
-The project is structured to support additional production integrations.
-
-Planned improvements include:
-
-* [ ] Real GitHub webhook integration
-* [ ] GitHub Actions integration
-* [ ] Real Docker Registry integration
-* [ ] AWS EC2 API integration
-* [ ] Live server metrics
-* [ ] Real-time deployment logs
-* [ ] Automated rollback
-* [ ] Blue/Green deployments
-* [ ] Canary deployments
-* [ ] Kubernetes deployment support
-* [ ] Terraform infrastructure provisioning
-* [ ] Prometheus metrics
-* [ ] Grafana dashboards
-* [ ] Trivy container scanning
-* [ ] SonarQube code-quality integration
-* [ ] Deployment notifications
-* [ ] Role-based access control
-* [ ] Audit logging
-
----
-
-# 🎯 DevOps Learning Objectives
-
-This project demonstrates practical concepts across the DevOps lifecycle:
-
-```text
-Source Control
-      ↓
-CI/CD
-      ↓
-Containerization
-      ↓
-Container Registry
-      ↓
-Cloud Infrastructure
-      ↓
-Automated Deployment
-      ↓
-Health Monitoring
-      ↓
-Logging
-      ↓
-Incident Management
-      ↓
-Security
-```
-
-It is designed as a portfolio project to demonstrate how a modern deployment platform can connect **application development, CI/CD, containers, cloud infrastructure, monitoring, and operational workflows**.
 
 ---
 
 # 🛠️ Useful Commands
 
-### Development
-
-```bash
-npm install
-npm run dev
-npm run build
-npm run lint
-```
-
-### Docker
-
-```bash
-docker build -f Dockerfile.frontend -t deployx-frontend .
-docker build -f Dockerfile.backend -t deployx-backend .
-
-docker compose up --build
-docker compose ps
-docker compose logs -f
-docker compose down
-```
-
-### Git
+## Git
 
 ```bash
 git status
 git add .
 git commit -m "Update DeployX"
-git push
+git push origin main
+```
+
+## Docker
+
+```bash
+docker compose build
+docker compose up -d
+docker compose ps
+docker compose logs -f
+docker compose down
+```
+
+## Frontend Health
+
+```bash
+curl http://localhost:8080
+```
+
+## Backend Health
+
+```text
+GET /healthz
 ```
 
 ---
 
-# 📌 Project Status
+# 🔒 Security Practices
 
-**Current status:** 🚧 Active Development
+DeployX follows practical DevSecOps principles:
 
-The current release focuses on the DeployX dashboard, demo workspace, Supabase integration boundary, Docker architecture, and production-oriented deployment design.
+* Secrets kept outside source control
+* GitHub Secrets for sensitive CI/CD configuration
+* Environment-based configuration
+* SSH authentication for Jenkins → GitHub
+* Non-root backend container
+* Dependency vulnerability scanning
+* Container vulnerability scanning
+* Static code analysis
+* Docker health checks
+* Internal backend networking
+* Nginx reverse proxy
+* Infrastructure as Code with Terraform
+* Continuous monitoring with Prometheus/Grafana
 
-Live cloud integrations are intentionally separated from the demo environment so the platform can be showcased safely without exposing infrastructure credentials.
+---
+
+# 📈 Future Enhancements
+
+The current core DevOps/DevSecOps environment is working.
+
+Planned improvements:
+
+* [ ] Public Jenkins webhook endpoint
+* [ ] Automated GitHub → Jenkins deployment trigger
+* [ ] HTTPS with a real domain
+* [ ] Automated rollback
+* [ ] Blue/Green deployments
+* [ ] Canary deployments
+* [ ] Kubernetes deployment
+* [ ] Centralized log aggregation
+* [ ] Alerting and notification integrations
+* [ ] Role-based access control
+* [ ] Audit logging
+* [ ] Backup and disaster recovery automation
+
+---
+
+# 🎯 DevOps / DevSecOps Learning Outcomes
+
+```text
+GitHub
+   ↓
+GitHub Actions
+   ↓
+CI/CD
+   ↓
+Build
+   ↓
+Code Quality
+   ↓
+Dependency Security
+   ↓
+Container Security
+   ↓
+Docker
+   ↓
+AWS EC2
+   ↓
+Jenkins Deployment
+   ↓
+Nginx
+   ↓
+Health Checks
+   ↓
+Prometheus
+   ↓
+Grafana
+   ↓
+Operational Monitoring
+```
+
+DeployX demonstrates how application development, infrastructure automation, CI/CD, security scanning, containerization, deployment automation, and observability can be combined into a practical DevOps/DevSecOps workflow.
+
+---
+
+# 📌 Current Status
+
+### ✅ Working
+
+* GitHub repository
+* GitHub Actions CI/CD
+* Frontend build
+* Backend build
+* SonarQube analysis
+* OWASP Dependency-Check
+* Trivy scanning
+* Terraform EC2 infrastructure
+* Docker Compose deployment
+* Jenkins deployment pipeline
+* Nginx reverse proxy
+* Node Exporter
+* Prometheus
+* Grafana
+* Node Exporter monitoring dashboard
+* Backend health checks
+
+### 🚧 Next
+
+* Public webhook connectivity
+* HTTPS/domain
+* Automated deployment trigger
+* Advanced rollback/deployment strategies
 
 ---
 
 # 👨‍💻 Author
 
-**Navnit Rathore**
+## Navnit Rathore
 
-DevOps Engineer | Cloud & DevSecOps Enthusiast
+**DevOps Engineer | Cloud & DevSecOps Enthusiast**
 
-Areas of interest:
+Focus areas:
 
 * AWS
 * DevOps
 * DevSecOps
 * Docker
 * Kubernetes
-* CI/CD
 * Terraform
+* CI/CD
 * Cloud Security
 * Infrastructure Automation
+* Observability
 
 ---
 
-## ⭐ Support
+## ⭐ Project
 
-If you find this project useful, consider giving the repository a ⭐ star.
+DeployX is a practical portfolio project focused on **automation, security, reliability, cloud infrastructure, deployment, and observability**.
 
-Built with a focus on **automation, reliability, security, and scalable DevOps workflows.**
+If you find the project useful, consider giving the repository a ⭐.
