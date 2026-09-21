@@ -1,0 +1,159 @@
+name: DeployX CI/CD
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+permissions:
+  contents: read
+  security-events: write
+
+env:
+  NODE_VERSION: "20"
+
+jobs:
+
+  # ==========================================
+  # BUILD FRONTEND
+  # ==========================================
+  build_frontend:
+    name: Build Frontend
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build frontend
+        run: npm run build
+
+
+  # ==========================================
+  # BUILD BACKEND
+  # ==========================================
+  build_backend:
+    name: Build Backend
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build backend
+        run: |
+          if npm run | grep -q "build:backend"; then
+            npm run build:backend
+          elif [ -f server/package.json ]; then
+            cd server
+            npm ci
+            npm run build
+          else
+            echo "Backend build configuration not found."
+            exit 1
+          fi
+
+
+  # ==========================================
+  # SONARQUBE
+  # ==========================================
+  sonarqube:
+    name: SonarQube Analysis
+    runs-on: ubuntu-latest
+    needs:
+      - build_frontend
+      - build_backend
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: SonarQube Scan
+        uses: SonarSource/sonarqube-scan-action@v6
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+          SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
+
+
+  # ==========================================
+  # OWASP DEPENDENCY CHECK
+  # ==========================================
+  owasp:
+    name: OWASP Dependency Check
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Run OWASP Dependency Check
+        uses: dependency-check/Dependency-Check_Action@main
+        with:
+          project: "DeployX"
+          path: "."
+          format: "HTML"
+          out: "owasp-reports"
+          args: >
+            --scan .
+            --enableRetired
+
+      - name: Upload OWASP report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: owasp-report
+          path: owasp-reports/
+
+
+  # ==========================================
+  # TRIVY CONTAINER SCAN
+  # ==========================================
+  trivy:
+    name: Trivy Container Scan
+    runs-on: ubuntu-latest
+    needs:
+      - build_frontend
+      - build_backend
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Build backend Docker image
+        run: |
+          docker build \
+            -f Dockerfile.backend \
+            -t deployx-backend:${{ github.sha }} \
+            .
+
+      - name: Run Trivy vulnerability scanner
+        uses: aquasecurity/trivy-action@master
+        with:
+          image-ref: deployx-backend:${{ github.sha }}
+          format: table
+          severity: HIGH,CRITICAL
+          ignore-unfixed: true
+          exit-code: 1
