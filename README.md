@@ -613,3 +613,13 @@ Focus areas:
 DeployX is a practical portfolio project focused on **automation, security, reliability, cloud infrastructure, deployment, and observability**.
 
 If you find the project useful, consider giving the repository a ⭐.
+
+# 🚀 DeployX
+
+### Production-Minded DevOps Deployment & Infrastructure Platform
+
+## 🌐 Live Demo
+
+[🚀 View DeployX Live](https://deploy-x-hcjs.vercel.app/)
+
+---
