@@ -75,9 +75,9 @@ AWS EC2
 # 🔄 CI/CD Pipeline
 
 ```text
-Git Push
-   │
-   ▼
+      Git Push
+         │
+         ▼
 ┌─────────────────────┐
 │       BUILD         │
 │ Frontend + Backend  │
