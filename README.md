@@ -87,9 +87,9 @@ AWS EC2
 ┌─────────────────────┐
 │      SECURITY       │
 │                     │
-│ SonarQube            │
-│ OWASP                │
-│ Trivy                │
+│ SonarQube           │
+│ OWASP               │
+│ Trivy               │
 └──────────┬──────────┘
            │
            ▼
